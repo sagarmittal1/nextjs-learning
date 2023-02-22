@@ -1,33 +1,52 @@
+import { MongoClient, ObjectId } from 'mongodb';
+
 import MeetupDetail from '../../components/meetups/MeetupDetail';
 
-const MeetupDetails = () => {
+const MeetupDetails = ({ meetupData }) => {
   return (
     <MeetupDetail
-      title="First Meetup"
-      image="https://images.pexels.com/photos/1709003/pexels-photo-1709003.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load"
-      address="Billford Stret, Minnesota"
-      description="This is the first meetup"
+      title={meetupData.title}
+      image={meetupData.image}
+      address={meetupData.address}
+      description={meetupData.description}
     />
   );
 };
 
 export async function getStaticPaths() {
+  const client = await MongoClient.connect(
+    'mongodb+srv://sagar:qstYz9fOtt7YgMQI@nextjs-learning.77er7o6.mongodb.net/?retryWrites=true&w=majority'
+  );
+
+  const db = client.db();
+
+  const meetupsCollection = db.collection('meetups');
+
+  const meetups = await meetupsCollection.find({}, { _id: 1 }).toArray();
+
+  client.close();
+
   return {
     // if false means if the paths not there here then generates 404 error
     // if true means the nextJS will pre-render the page for it & it generates pages on path pages
     fallback: false,
-    paths: [
-      {
-        params: {
-          meetupId: 'm1',
-        },
-      },
-      {
-        params: {
-          meetupId: 'm2',
-        },
-      },
-    ],
+    paths: meetups.map((meetup) => ({
+      params: { meetupId: meetup._id.toString() },
+    })),
+
+    // // the pattern to follow
+    // [
+    //   {
+    //     params: {
+    //       meetupId: 'm1',
+    //     },
+    //   },
+    //   {
+    //     params: {
+    //       meetupId: 'm2',
+    //     },
+    //   },
+    // ],
   };
 }
 
@@ -35,15 +54,28 @@ export async function getStaticProps(context) {
   const meetupId = context.params.meetupId;
   // console.log(meetupId);
 
+  const client = await MongoClient.connect(
+    'mongodb+srv://sagar:qstYz9fOtt7YgMQI@nextjs-learning.77er7o6.mongodb.net/?retryWrites=true&w=majority'
+  );
+
+  const db = client.db();
+
+  const meetupsCollection = db.collection('meetups');
+
+  const selectedMeetup = await meetupsCollection.findOne({
+    _id: new ObjectId(meetupId),
+  });
+
+  client.close();
+
   return {
     props: {
       meetupData: {
-        image:
-          'https://images.pexels.com/photos/1709003/pexels-photo-1709003.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load',
-        id: meetupId,
-        title: 'First Meetup',
-        address: 'Billford Stret, Minnesota',
-        description: 'This is the first event',
+        id: selectedMeetup._id.toString(),
+        title: selectedMeetup.title,
+        address: selectedMeetup.address,
+        image: selectedMeetup.image,
+        description: selectedMeetup.description,
       },
     },
   };

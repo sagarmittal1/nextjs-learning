@@ -18,6 +18,7 @@ function HomePage(props) {
 // }
 
 export async function getStaticProps() {
+  // this code will run on server so it will not be exposesd
   const client = await MongoClient.connect(
     'mongodb+srv://sagar:qstYz9fOtt7YgMQI@nextjs-learning.77er7o6.mongodb.net/?retryWrites=true&w=majority'
   );
