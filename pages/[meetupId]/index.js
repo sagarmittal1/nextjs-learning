@@ -36,7 +36,7 @@ export async function getStaticPaths() {
   return {
     // if false means if the paths not there here then generates 404 error
     // if true means the nextJS will pre-render the page for it & it generates pages on path pages
-    fallback: false,
+    fallback: 'blocking',
     paths: meetups.map((meetup) => ({
       params: { meetupId: meetup._id.toString() },
     })),

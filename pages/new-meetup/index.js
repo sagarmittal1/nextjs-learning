@@ -29,7 +29,7 @@ const NewMeetupPage = () => {
           content="Add your own meetup & get to meet amazing fellas."
         />
       </Head>
-      <NewMeetupForm onAddMeetup={addMeetupHandler} />;
+      <NewMeetupForm onAddMeetup={addMeetupHandler} />
     </>
   );
 };
